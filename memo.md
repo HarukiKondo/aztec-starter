@@ -126,3 +126,67 @@ Simulation result:  25n
 ```
 
 ここまで動けば一旦サンドボックスでの検証はOK！
+
+## テストネットでの挙動チェック
+
+### 事前準備
+
+```bash
+aztec-up -v latest
+
+export NODE_URL=https://aztec-testnet-fullnode.zkv.xyz
+export SPONSORED_FPC_ADDRESS=0x299f255076aa461e4e94a843f0275303470a6b8ebe7cb44a471c66711151e529
+```
+
+### ウォレット作成
+
+テストネット上にウォレット(スマートウォレット)を作成(コントラクトをデプロイ)する
+
+```bash
+aztec-wallet create-account \
+    --register-only \
+    --node-url $NODE_URL \
+    --alias my-wallet
+```
+
+以下のようになればOK!
+
+```bash
+Address:         0x1789da5323bb81ab10ad44fc41896b227b635441e7a97d420a0f5e29b8352591
+Public key:      0x05a121aa953c4584586a2eaf04044fb79792aa53638e39610ef9a087d770bf491c9f608c65b9aa13d5c6a1290b95589623358e49c6d63a7ce69f0bbc9385d49f1cf39146060834eac1e230f270de697a30cedffe7313b631e15116cf568cffe418105c417be106676000c4afdc6929931f788dfe65b5be18f84a91e06a3126901d0a4be0147f382728c63aad829b307452f462deaec2083be930c6a8fce5db1e27488600a5ff6b88850bab6b67315b68bee2196912f421a1fff8b85c489da86e0b92f99da8836c644836a3ccb126a95b3f671bfb8eec7448a3978b41eb59fea11f29c19dd71802564a3af7d4ec3c7f93673a24b8a8e574914eee9c3589d407ba
+Secret key:     0x07bdf184b603f5ef0cc525b34bf2843f77c03db3633ca5e7c0a899f0db344d57
+Partial address: 0x2c31c1c997fb942580d1cd4b1acdaf4f8893272b1839d53e25aff2aa9f725d1c
+Salt:            0x0000000000000000000000000000000000000000000000000000000000000000
+Init hash:       0x2c51487e2c7f41aabecbb3d66a3896518cc7c5d4f3050df1a88ec91990669c53
+Deployer:        0x0000000000000000000000000000000000000000000000000000000000000000
+```
+
+続いて以下のコマンドを実行
+
+```bash
+aztec-wallet register-contract \
+    --node-url $NODE_URL \
+    --from my-wallet \
+    --alias sponsoredfpc \
+    $SPONSORED_FPC_ADDRESS SponsoredFPC \
+    --salt 0
+```
+
+```bash
+[06:37:03.526] INFO: pxe:data:lmdb Starting data store with maxReaders 16
+Contract not found in the node at 0x299f255076aa461e4e94a843f0275303470a6b8ebe7cb44a471c66711151e529. Computing instance locally...
+[06:37:04.588] INFO: pxe:service Started PXE connected to chain 11155111 version 845231713
+Contract registered: at 0x299f255076aa461e4e94a843f0275303470a6b8ebe7cb44a471c66711151e529
+Contract stored in database with aliases last & sponsoredfpc
+[06:37:05.282] INFO: pxe:service Added contract SponsoredFPC at 0x299f255076aa461e4e94a843f0275303470a6b8ebe7cb44a471c66711151e529 with class 0x102dc399ad6171c78fc69f6df4db053c626691d5777e04164bd3cd9c8296de7b
+```
+
+続いて以下をデプロイ
+
+```bash
+aztec-wallet deploy-account \
+    --node-url $NODE_URL \
+    --from my-wallet \
+    --payment method=fpc-sponsored,fpc=contracts:sponsoredfpc \
+    --register-class
+```
