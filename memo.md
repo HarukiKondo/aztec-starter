@@ -181,7 +181,7 @@ Contract stored in database with aliases last & sponsoredfpc
 [06:37:05.282] INFO: pxe:service Added contract SponsoredFPC at 0x299f255076aa461e4e94a843f0275303470a6b8ebe7cb44a471c66711151e529 with class 0x102dc399ad6171c78fc69f6df4db053c626691d5777e04164bd3cd9c8296de7b
 ```
 
-続いて以下をデプロイ
+続いて以下でデプロイ実行
 
 ```bash
 aztec-wallet deploy-account \
@@ -189,4 +189,10 @@ aztec-wallet deploy-account \
     --from my-wallet \
     --payment method=fpc-sponsored,fpc=contracts:sponsoredfpc \
     --register-class
+```
+
+## コントラクトのコンパイル
+
+```bash
+yarn compile && yarn codegen
 ```
